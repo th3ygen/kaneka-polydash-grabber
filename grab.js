@@ -44,8 +44,10 @@ const task = () => {
 
 ws.on('open', () => {
 	console.log('Connected to websocket server!');
-
+	
 	const job = schedule.scheduleJob('*/1 * * * *', task);
-
+	
 	if (job) console.log("Job started!");
+	task();
 });
+
