@@ -9,12 +9,15 @@ const command =
 
 const ws = new WebSocket(wsUrl);
 
+const getMalaysiaTime = () =>
+	new Date().toLocaleString("en-US", { timeZone: "Asia/Kuala_Lumpur" });
+
 const task = () => {
-	console.log(`[${new Date().toLocaleString()}] Grabbing data from JDBC...`);
+	console.log(`[${getMalaysiaTime()}] Grabbing data from JDBC...`);
 	exec(command, (err, out, stderr) => {
 		if (err) {
 			console.error(
-				`[${new Date().toLocaleString()}] Error executing command: ${err}`
+				`[${getMalaysiaTime()}] Error executing command: ${err}`
 			);
 		}
 
@@ -37,17 +40,15 @@ const task = () => {
 		const bytes = JSON.stringify(data).length;
 
 		console.log(
-			`[${new Date().toLocaleString()}] Data event:`,
+			`[${getMalaysiaTime()}] Data event:`,
 			bytes > 0 ? `${bytes} bytes` : "Not found"
 		);
 
 		if (ws && ws.readyState === WebSocket.OPEN) {
 			ws.send(JSON.stringify(data));
-			console.log(`[${new Date().toLocaleString()}] Pushed data`);
+			console.log(`[${getMalaysiaTime()}] Pushed data`);
 		} else {
-			console.error(
-				`[${new Date().toLocaleString()}] WebSocket not connected`
-			);
+			console.error(`[${getMalaysiaTime()}] WebSocket not connected`);
 		}
 	});
 };
@@ -60,17 +61,15 @@ console.log(
 );
 console.log("The data is grabbed every minute.");
 ws.on("open", () => {
-	console.log(
-		`[${new Date().toLocaleString()}] Connected to websocket server!`
-	);
+	console.log(`[${getMalaysiaTime()}] Connected to websocket server!`);
 
 	// Schedule the task to run every minute
 	const job = schedule.scheduleJob("*/1 * * * *", task);
 
-	if (job) console.log(`[${new Date().toLocaleString()}] Job started!`);
+	if (job) console.log(`[${getMalaysiaTime()}] Job started!`);
 	task();
 });
 
 ws.on("error", (err) => {
-	console.error(`[${new Date().toLocaleString()}] WebSocket error: ${err}`);
+	console.error(`[${getMalaysiaTime()}] WebSocket error: ${err}`);
 });
