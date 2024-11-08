@@ -18,7 +18,7 @@ const task = () => {
 			);
 		}
 
-		const lines = out.split("\n");
+		const lines = out ? out.split("\n") : [];
 
 		const data = {};
 		const pattern = /(-?\w+)\s+(-?[\d.]+)/;
@@ -34,9 +34,11 @@ const task = () => {
 
 		if (data["Driver"]) delete data["Driver"];
 
+		const bytes = JSON.stringify(data).length;
+
 		console.log(
 			`[${new Date().toLocaleString()}] Data event:`,
-			JSON.stringify(data).length > 0 ? `${data} bytes` : "Not found"
+			bytes > 0 ? `${bytes} bytes` : "Not found"
 		);
 
 		if (ws && ws.readyState === WebSocket.OPEN) {
@@ -62,12 +64,13 @@ ws.on("open", () => {
 		`[${new Date().toLocaleString()}] Connected to websocket server!`
 	);
 
+	// Schedule the task to run every minute
 	const job = schedule.scheduleJob("*/1 * * * *", task);
 
 	if (job) console.log(`[${new Date().toLocaleString()}] Job started!`);
 	task();
 });
 
-ws.on('error', (err) => {
+ws.on("error", (err) => {
 	console.error(`[${new Date().toLocaleString()}] WebSocket error: ${err}`);
 });
